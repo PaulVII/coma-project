@@ -1,7 +1,7 @@
 # COMA Schema Matcher
 
 This is a fork of the [COMA schema matcher](https://dbs.uni-leipzig.de/Research/coma.html)
-(Code from [this]( https://svn.code.sf.net/p/coma-ce/mysvn/trunk coma-ce-mysvn) SVN repo)
+(Code from [this]( https://svn.code.sf.net/p/coma-ce/mysvn/trunk) SVN repo)
 modified for use in [BCNFStar](https://github.com/SchweizerischeBundesbahnen/BCNFStar).
 
 ## How to use
