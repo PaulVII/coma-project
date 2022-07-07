@@ -47,16 +47,24 @@ public class COMA_API {
 	Manager manager = null;
 
 	public static void main(String[] args) {
+		// String[] args = { "core.sql", "landing.sql", "result.json" };
+
 		if (args.length < 3) {
 			System.out.println(
-				"Invalid arguments. Use like this: java <cp> <classname> <leftSchemaFile> <rightSchemaFile> <resultFile>");
-			}
+					"Invalid arguments. Use like this: java -cp=\"<classpath>\" de.wdilab.coma.integration.COMA_API <resultFile> <leftSchemaFile> <rightSchemaFile> [<abbreviationsFile> <synonymsFile>]");
+			System.out.println(
+					"Abbreviation and synonym files are optional. Every line represents a comma-separated pair of words (e.g. \"number,nr\")");
+		}
 		COMA_API a = new COMA_API();
-		MatchResult result = a.matchModelsDefault(args[0], args[1]);
+		MatchResult result;
+		if (args.length < 5)
+			result = a.matchModelsDefault(args[1], args[2]);
+		else
+			result = a.matchModelsDefault(args[1], args[2], args[3], args[4]);
 		System.out.println(result);
 
 		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(args[2]), "utf-8"))) {
+				new FileOutputStream(args[0]), "utf-8"))) {
 			writer.write(result.toJsonString());
 		} catch (Exception e) {
 			System.out.print(e);
@@ -241,6 +249,9 @@ public class COMA_API {
 			System.out.println("COMA_API.loadGraph Error file is null");
 			return null;
 		}
+		if (file.startsWith("odbc:")) {
+			return loadGraphOdbc(file.substring(5), name);
+		}
 		boolean insertDB = false;
 		String filetype = file.toLowerCase();
 		filetype = filetype.substring(filetype.lastIndexOf("."));
@@ -265,6 +276,15 @@ public class COMA_API {
 		par.parseSingleSource(file);
 		Graph graph = par.getGraph();
 		return graph;
+	}
+
+	private Graph loadGraphOdbc(String file, String name) {
+		ODBCParser parser = new ODBCParser(false);
+		// entry, pw, userpass, schemaname
+		String[] parts = file.split("~");
+		System.out.print(parts);
+		parser.parseSingleSource(parts[0], parts[1], parts[2], parts[3]);
+		return parser.getGraph();
 	}
 
 	public MatchResult loadMatchResult(String file) {
